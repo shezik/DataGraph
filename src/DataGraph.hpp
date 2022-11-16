@@ -22,6 +22,7 @@ class DataGraph {
         uint8_t xDistance = 0;
         double *dataRingBuffer = nullptr;
         double peakValue = 1.0;
+        double bottomValue = 0.0;
         bool autoScroll = true;
         bool autoScaling = true;
         enum CursorMode cursorMode = HIDDEN;
@@ -40,6 +41,7 @@ class DataGraph {
         void setAutoScaling(bool enabled);  // Fit waveform to screen dynamically
         void setXDistance(uint8_t dist);  // Set spacing between each data point
         void setPeakValue(double val);  // Disables auto-scaling
+        void setBottomValue(double val);  // Disables auto-scaling
         void setGridMode(enum GridMode mode);  // Grids!
         void jumpTo(uint16_t n);  // Move right boundary to nth point
         double getValueAt(uint16_t n);

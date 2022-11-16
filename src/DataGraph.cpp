@@ -35,6 +35,7 @@ void DataGraph::appendValue(double val) {
 }
 
 void DataGraph::drawCursor(uint16_t pos) {
+    // *CALL AFTER SETTING PROPER PEAK AND BOTTOM VALUES!!*
     switch (cursorMode) {
         case DETAILED:
             char str[64];
@@ -42,7 +43,7 @@ void DataGraph::drawCursor(uint16_t pos) {
             Serial.printf("%s\n", str);  // DEBUG
             u8g2.setFont(u8g2_font_ncenB08_tr);  // DEBUG
             u8g2.drawStr((graphLength - 1) - (1 + xDistance) * (rightBoundary - pos) + /*Move right*/2, \
-                         graphHeight - 1 - round(dataRingBuffer[pos] / peakValue * (graphHeight - 1)) - /*Move up*/5, \
+                         graphHeight - 1 - round((dataRingBuffer[pos] - bottomValue) / (peakValue - bottomValue) * (graphHeight - 1)) - /*Move up*/5, \
                          str);
             // No break here!
         case SIMPLE:
@@ -56,13 +57,19 @@ void DataGraph::drawCursor(uint16_t pos) {
 void DataGraph::draw() {
     if (autoScaling) {
         // Find peak value in window
-        peakValue = 1.0;
+        bottomValue = dataRingBuffer[rightBoundary];  // Initialize with a feasible value
+        peakValue = bottomValue + 1.0;
         for (int32_t i = rightBoundary; i >= 0; i--) {  // In case that the buffer is narrower than graphLength
-        // OVERFLOW IF USE uint16_t
+                // OVERFLOW IF USE uint16_t
             if (rightBoundary - i > graphLength) {
                 break;
-            } else if (dataRingBuffer[i] > peakValue) {
-                peakValue = dataRingBuffer[i];
+            } else {
+                if (dataRingBuffer[i] > peakValue) {
+                    peakValue = dataRingBuffer[i];
+                }
+                if (dataRingBuffer[i] < bottomValue) {
+                    bottomValue = dataRingBuffer[i];
+                }
             }
         }
     }
@@ -70,7 +77,7 @@ void DataGraph::draw() {
     if (xDistance == 0) {
         for (int32_t i = rightBoundary; i >= 0; i--) {
             if (rightBoundary - i > graphLength - 1) break;
-            u8g2.drawPixel((graphLength - 1) - (rightBoundary - i), graphHeight - 1 - round(dataRingBuffer[i] / peakValue * (graphHeight - 1)));
+            u8g2.drawPixel((graphLength - 1) - (rightBoundary - i), graphHeight - 1 - round((dataRingBuffer[i] - bottomValue) / (peakValue - bottomValue) * (graphHeight - 1)));
             if (i == cursorPos) drawCursor(i);
         }
     } else {  // such complication
@@ -80,9 +87,9 @@ void DataGraph::draw() {
                 break;
             }
             u8g2.drawLine((graphLength - 1) - (1 + xDistance) * (rightBoundary - i), \
-                          graphHeight - 1 - round(dataRingBuffer[i] / peakValue * (graphHeight - 1)), \
+                          graphHeight - 1 - round((dataRingBuffer[i] - bottomValue) / (peakValue - bottomValue) * (graphHeight - 1)), \
                           (graphLength - 1) - (1 + xDistance) * (rightBoundary - (i - 1)), \
-                          graphHeight - 1 - round(dataRingBuffer[i - 1] / peakValue * (graphHeight - 1)));
+                          graphHeight - 1 - round((dataRingBuffer[i - 1] - bottomValue) / (peakValue - bottomValue) * (graphHeight - 1)));
             if (i == cursorPos || (i == 1 && cursorPos == 0)) drawCursor(cursorPos);
         }
     }
@@ -103,6 +110,11 @@ void DataGraph::setXDistance(uint8_t dist) {
 void DataGraph::setPeakValue(double val) {
     setAutoScaling(false);
     peakValue = val;
+}
+
+void DataGraph::setBottomValue(double val) {
+    setAutoScaling(false);
+    bottomValue = val;
 }
 
 void DataGraph::setGridMode(enum GridMode mode) {
