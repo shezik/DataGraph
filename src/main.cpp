@@ -1,5 +1,3 @@
-#define U8G2_DEVICE_TYPE U8G2_SSD1306_128X64_NONAME_F_SW_I2C
-
 #include "DataGraph.hpp"
 #include <Arduino.h>
 #include <U8g2lib.h>
@@ -50,7 +48,7 @@ bool checkKey(int pin, int delayms) {
 void setup() {
     Serial.begin(115200);
     u8g2.begin();
-    u8g2.setFont(u8g2_font_ncenB08_tr);
+    u8g2.setFont(U8G2_USER_FONT);
 
     if (!arciic.i2c_init()) Serial.println("Failed to init SlowSoftI2C!\n");
 
@@ -92,9 +90,9 @@ void setup() {
     voltageGraph.setXDistance(1);
     currentGraph.setXDistance(1);
     powerGraph.setXDistance(1);
-    // voltageGraph.setCursorMode(DETAILED);
-    // currentGraph.setCursorMode(DETAILED);
-    // powerGraph.setCursorMode(DETAILED);
+    voltageGraph.setCursorMode(DETAILED);
+    currentGraph.setCursorMode(DETAILED);
+    powerGraph.setCursorMode(DETAILED);
 }
 
 void loop() {

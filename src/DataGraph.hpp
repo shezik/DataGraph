@@ -1,6 +1,10 @@
 #pragma once
 
-#define U8G2_DEVICE_TYPE U8G2_SSD1306_128X64_NONAME_F_SW_I2C  // customizable
+// Customizable
+#define U8G2_DEVICE_TYPE U8G2_SSD1306_128X64_NONAME_F_SW_I2C
+#define U8G2_USER_FONT u8g2_font_6x13B_mr
+#define U8G2_USER_FONT_WIDTH 6
+#define U8G2_USER_FONT_HEIGHT 13
 
 #include <Arduino.h>
 #include <U8g2lib.h>

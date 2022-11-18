@@ -36,14 +36,19 @@ void DataGraph::appendValue(double val) {
 
 void DataGraph::drawCursor(uint16_t pos) {
     // *CALL AFTER SETTING PROPER PEAK AND BOTTOM VALUES!!*
+
+    static char str[64];
+    uint8_t charCount = sprintf(str, "%.0f", dataRingBuffer[pos]);  // 0 decimal places, customizable
+    int32_t curX = (graphLength - 1) - (1 + xDistance) * (rightBoundary - pos);
+    int32_t curY = graphHeight - 1 - round((dataRingBuffer[pos] - bottomValue) / (peakValue - bottomValue) * (graphHeight - 1));
+    if (curX - (U8G2_USER_FONT_WIDTH * charCount + 1) > 0) curX -= U8G2_USER_FONT_WIDTH * charCount + 1; else curX += 1;
+    if (curY + U8G2_USER_FONT_HEIGHT + 1 < graphHeight - 1) curY += U8G2_USER_FONT_HEIGHT + 1; else curY -= 1;
+    // printf("%s, charCount = %d, curX = %d, curY = %d\n", str, charCount, curX, curY);  // DEBUG
+
     switch (cursorMode) {
         case DETAILED:
-            char str[64];
-            sprintf(str, "%.4f", dataRingBuffer[pos]);  // 4 decimal places
-            u8g2.setFont(u8g2_font_ncenB08_tr);  // DEBUG
-            u8g2.drawStr((graphLength - 1) - (1 + xDistance) * (rightBoundary - pos) + /*Move right*/2, \
-                         graphHeight - 1 - round((dataRingBuffer[pos] - bottomValue) / (peakValue - bottomValue) * (graphHeight - 1)) - /*Move up*/5, \
-                         str);
+            u8g2.setFont(U8G2_USER_FONT);  // DEBUG
+            u8g2.drawStr(curX, curY, str);
             // No break here!
         case SIMPLE:
             u8g2.drawVLine((graphLength - 1) - (1 + xDistance) * (rightBoundary - pos), 0, graphHeight);
