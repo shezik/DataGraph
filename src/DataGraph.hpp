@@ -40,7 +40,7 @@ class DataGraph {
         void setAutoScroll(bool enabled);  // Move to right boundary *on data addition*
         void setAutoScaling(bool enabled);  // Fit waveform to screen dynamically
         void setXDistance(uint8_t dist);  // Set spacing between each data point
-        void setPeakValue(double val);  // Disables auto-scaling
+        void setPeakValue(double val);    // Disables auto-scaling
         void setBottomValue(double val);  // Disables auto-scaling
         void setGridMode(enum GridMode mode);  // Grids!
         void jumpTo(uint16_t n);  // Move right boundary to nth point

@@ -8,9 +8,9 @@
 
 U8G2_DEVICE_TYPE u8g2(U8G2_R0, /* clock=*/5, /* data=*/17 /*, reset=*/);
 SlowSoftI2CMaster arciic = SlowSoftI2CMaster(19, 18);
-DataGraph voltageGraph(128, 64, 128, u8g2);
-DataGraph currentGraph(128, 64, 128, u8g2);
-DataGraph powerGraph(128, 64, 128, u8g2);
+DataGraph voltageGraph(128, 64, 256, u8g2);
+DataGraph currentGraph(128, 64, 256, u8g2);
+DataGraph powerGraph(128, 64, 256, u8g2);
 
 int whichGraph  = 0;  // 0: voltageGraph
                       // 1: currentGraph
@@ -92,9 +92,9 @@ void setup() {
     voltageGraph.setXDistance(1);
     currentGraph.setXDistance(1);
     powerGraph.setXDistance(1);
-    voltageGraph.setCursorMode(DETAILED);
-    currentGraph.setCursorMode(DETAILED);
-    powerGraph.setCursorMode(DETAILED);
+    // voltageGraph.setCursorMode(DETAILED);
+    // currentGraph.setCursorMode(DETAILED);
+    // powerGraph.setCursorMode(DETAILED);
 }
 
 void loop() {
@@ -122,20 +122,30 @@ void loop() {
         }
     }
 
-    if (displayMode == 0 && checkKey(32, 10)) {
-        switch (whichGraph) {
-            case 0:
-                voltageGraph.jumpTo(voltageGraph.getBufferLength() - 1);
-                voltageGraph.setAutoScroll(true);
-                break;
-            case 1:
-                currentGraph.jumpTo(currentGraph.getBufferLength() - 1);
-                currentGraph.setAutoScroll(true);
-                break;
-            case 2:
-                powerGraph.jumpTo(powerGraph.getBufferLength() - 1);
-                powerGraph.setAutoScroll(true);
-                break;
+    if (displayMode == 0) {
+        if (checkKey(32, 10)) {
+            switch (whichGraph) {
+                case 0:
+                    voltageGraph.jumpTo(voltageGraph.getBufferLength() - 1);
+                    voltageGraph.setAutoScroll(true);
+                    break;
+                case 1:
+                    currentGraph.jumpTo(currentGraph.getBufferLength() - 1);
+                    currentGraph.setAutoScroll(true);
+                    break;
+                case 2:
+                    powerGraph.jumpTo(powerGraph.getBufferLength() - 1);
+                    powerGraph.setAutoScroll(true);
+                    break;
+            }
+        } else if (checkKey(23, 10)) {
+
+        } else if (checkKey(33, 10)) {
+
+        } else if (checkKey(26, 10)) {
+
+        } else if (checkKey(25, 10)) {
+
         }
     }
 

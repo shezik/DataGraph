@@ -40,7 +40,6 @@ void DataGraph::drawCursor(uint16_t pos) {
         case DETAILED:
             char str[64];
             sprintf(str, "%.4f", dataRingBuffer[pos]);  // 4 decimal places
-            Serial.printf("%s\n", str);  // DEBUG
             u8g2.setFont(u8g2_font_ncenB08_tr);  // DEBUG
             u8g2.drawStr((graphLength - 1) - (1 + xDistance) * (rightBoundary - pos) + /*Move right*/2, \
                          graphHeight - 1 - round((dataRingBuffer[pos] - bottomValue) / (peakValue - bottomValue) * (graphHeight - 1)) - /*Move up*/5, \
@@ -57,11 +56,12 @@ void DataGraph::drawCursor(uint16_t pos) {
 void DataGraph::draw() {
     if (autoScaling) {
         // Find peak value in window
-        bottomValue = dataRingBuffer[rightBoundary];  // Initialize with a feasible value
-        peakValue = bottomValue + 1.0;
+        bottomValue = peakValue = dataRingBuffer[rightBoundary];  // Initialize with a feasible value
         for (int32_t i = rightBoundary; i >= 0; i--) {  // In case that the buffer is narrower than graphLength
                 // OVERFLOW IF USE uint16_t
-            if (rightBoundary - i > graphLength) {
+            // printf("%d, dataRingBuffer[i] = %f, peakValue = %f, bottomValue = %f\n", rightBoundary - i, dataRingBuffer[i], peakValue, bottomValue);  // DEBUG
+            if (rightBoundary - i > floor((graphLength + xDistance) / (xDistance + 1)) - 1) {
+                // printf("Break\n");  // DEBUG
                 break;
             } else {
                 if (dataRingBuffer[i] > peakValue) {
@@ -72,6 +72,7 @@ void DataGraph::draw() {
                 }
             }
         }
+        if (bottomValue == peakValue) peakValue += 1.0;  // Bad things are gonna happen if they are equal
     }
 
     if (xDistance == 0) {
