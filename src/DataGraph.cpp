@@ -41,17 +41,19 @@ void DataGraph::drawCursor(uint16_t pos) {
     uint8_t charCount = sprintf(str, "%.0f", dataRingBuffer[pos]);  // 0 decimal places, customizable
     int32_t curX = (graphLength - 1) - (1 + xDistance) * (rightBoundary - pos);
     int32_t curY = graphHeight - 1 - round((dataRingBuffer[pos] - bottomValue) / (peakValue - bottomValue) * (graphHeight - 1));
-    if (curX - (U8G2_USER_FONT_WIDTH * charCount + 1) > 0) curX -= U8G2_USER_FONT_WIDTH * charCount + 1; else curX += 1;
-    if (curY + U8G2_USER_FONT_HEIGHT + 1 < graphHeight - 1) curY += U8G2_USER_FONT_HEIGHT + 1; else curY -= 1;
+    int32_t strX, strY;
+    if (curX - (U8G2_USER_FONT_WIDTH * charCount + 1) > 0)  strX = curX - (U8G2_USER_FONT_WIDTH * charCount + 1); else strX = curX + 1;
+    if (curY + U8G2_USER_FONT_HEIGHT + 1 < graphHeight - 1) strY = curY + U8G2_USER_FONT_HEIGHT + 1;              else strY = curY - 1;
     // printf("%s, charCount = %d, curX = %d, curY = %d\n", str, charCount, curX, curY);  // DEBUG
 
     switch (cursorMode) {
         case DETAILED:
             u8g2.setFont(U8G2_USER_FONT);  // DEBUG
-            u8g2.drawStr(curX, curY, str);
+            u8g2.drawStr(strX, strY, str);
             // No break here!
         case SIMPLE:
-            u8g2.drawVLine((graphLength - 1) - (1 + xDistance) * (rightBoundary - pos), 0, graphHeight);
+            u8g2.drawVLine(curX, curY - 2 >= 0 ? curY - 2 : 0, curY - 2 >= 0 ? 5 : 5 + (curY - 2));  // 5 pixels tall
+            if (curX - 1 >= 0) u8g2.drawVLine(curX - 1, curY - 2 >= 0 ? curY - 2 : 0, curY - 2 >= 0 ? 5 : 5 + (curY - 2));  // THICKER
             break;
         default:
             break;
