@@ -41,17 +41,18 @@ class DataGraph {
         bool init();  // Allocate memory for the buffer
         void draw();  // Please call u8g2.sendBuffer() manually
         void appendValue(double val);  // !! POSITIVE VALUE ONLY!?
-        void setAutoScroll(bool enabled);  // Move to right boundary *on data addition*
+        void setAutoScroll(bool enabled);  // Move screen AND cursor to right boundary **on data addition**
         void setAutoScaling(bool enabled);  // Fit waveform to screen dynamically
         void setXDistance(uint8_t dist);  // Set spacing between each data point
         void setPeakValue(double val);    // Disables auto-scaling
         void setBottomValue(double val);  // Disables auto-scaling
         void setGridMode(enum GridMode mode);  // Grids!
-        void jumpTo(uint16_t n);  // Move right boundary to nth point
+        void setRightBoundary(int32_t n);  // Move right boundary to nth point, detects out-of-bound jumps
         double getValueAt(uint16_t n);
 
         uint16_t getCursorPos() {return cursorPos;}
-        void setCursorPos(uint16_t pos);
+        void setCursorPos(int32_t pos);  // Detects out-of-bpund jumps
+        void moveCursor(int32_t step);
         void setCursorMode(enum CursorMode mode);
 
         uint16_t getLength() {return graphLength;}

@@ -68,9 +68,9 @@ void setup() {
 
     // 五向摇杆 I/O
     pinMode(23,  INPUT_PULLUP);  // Up
-    pinMode(33,  INPUT_PULLUP);  // Down
+    pinMode(25,  INPUT_PULLUP);  // Down
     pinMode(26,  INPUT_PULLUP);  // Left
-    pinMode(25,  INPUT_PULLUP);  // Right
+    pinMode(33,  INPUT_PULLUP);  // Right
     pinMode(32,  INPUT_PULLUP);  // OK
 
     // USB 数据线
@@ -121,33 +121,80 @@ void loop() {
     }
 
     if (displayMode == 0) {
-        if (checkKey(32, 10)) {
+        if (checkKey(32, 10)) {  // OK
             switch (whichGraph) {
                 case 0:
-                    voltageGraph.jumpTo(voltageGraph.getBufferLength() - 1);
                     voltageGraph.setAutoScroll(true);
                     break;
                 case 1:
-                    currentGraph.jumpTo(currentGraph.getBufferLength() - 1);
                     currentGraph.setAutoScroll(true);
                     break;
                 case 2:
-                    powerGraph.jumpTo(powerGraph.getBufferLength() - 1);
                     powerGraph.setAutoScroll(true);
                     break;
             }
-        } else if (checkKey(23, 10)) {
-
-        } else if (checkKey(33, 10)) {
-
-        } else if (checkKey(26, 10)) {
-
-        } else if (checkKey(25, 10)) {
-
+        } else if (checkKey(23, 10)) {  // Up
+            switch (whichGraph) {
+                case 0:
+                    voltageGraph.moveCursor(-10);
+                    voltageGraph.setAutoScroll(false);
+                    break;
+                case 1:
+                    currentGraph.moveCursor(-10);
+                    currentGraph.setAutoScroll(false);
+                    break;
+                case 2:
+                    powerGraph.moveCursor(-10);
+                    powerGraph.setAutoScroll(false);
+                    break;
+            }
+        } else if (checkKey(25, 10)) {  // Down
+            switch (whichGraph) {
+                case 0:
+                    voltageGraph.moveCursor(10);
+                    voltageGraph.setAutoScroll(false);
+                    break;
+                case 1:
+                    currentGraph.moveCursor(10);
+                    currentGraph.setAutoScroll(false);
+                    break;
+                case 2:
+                    powerGraph.moveCursor(10);
+                    powerGraph.setAutoScroll(false);
+                    break;
+            }
+        } else if (checkKey(26, 10)) {  // Left
+            switch (whichGraph) {
+                case 0:
+                    voltageGraph.moveCursor(-1);
+                    voltageGraph.setAutoScroll(false);
+                    break;
+                case 1:
+                    currentGraph.moveCursor(-1);
+                    currentGraph.setAutoScroll(false);
+                    break;
+                case 2:
+                    powerGraph.moveCursor(-1);
+                    powerGraph.setAutoScroll(false);
+                    break;
+            }
+        } else if (checkKey(33, 10)) {  // Right
+            switch (whichGraph) {
+                case 0:
+                    voltageGraph.moveCursor(1);
+                    voltageGraph.setAutoScroll(false);
+                    break;
+                case 1:
+                    currentGraph.moveCursor(1);
+                    currentGraph.setAutoScroll(false);
+                    break;
+                case 2:
+                    powerGraph.moveCursor(1);
+                    powerGraph.setAutoScroll(false);
+                    break;
+            }
         }
     }
-
-    // !! What about other keys?
 
     u8g2.clearBuffer();
     if (displayMode) {

@@ -31,7 +31,29 @@ void DataGraph::appendValue(double val) {
         dataRingBuffer[i] = dataRingBuffer[i + 1];
     }
     dataRingBuffer[ringBufferLength - 1] = val;
-    if (autoScroll) rightBoundary = ringBufferLength - 1;
+    if (autoScroll) {
+        rightBoundary = ringBufferLength - 1;
+        setCursorPos(rightBoundary);
+    } else {
+        if (rightBoundary > floor((graphLength + xDistance) / (xDistance + 1)) - 1) rightBoundary--;  // Keep relatively still
+        if (cursorPos > 0) cursorPos--;
+    }
+}
+
+void DataGraph::moveCursor(int32_t step) {
+    if (step > 0) {
+        if (cursorPos + step > rightBoundary) {
+            uint16_t delta = step - (rightBoundary - cursorPos);  // Definitely > 0
+            setRightBoundary(rightBoundary + ceil(delta / floor(graphLength / 2)) * floor(graphLength / 2));
+        }
+    } else {  // step < 0
+        if (cursorPos + step < rightBoundary - (floor((graphLength + xDistance) / (xDistance + 1)) - 1)) {
+            uint16_t delta = -step - (cursorPos - (rightBoundary - (floor((graphLength + xDistance) / (xDistance + 1)) - 1)));
+            setRightBoundary(rightBoundary - ceil(delta / floor(graphLength / 2)) * floor(graphLength / 2));
+        }
+    }
+
+    setCursorPos(cursorPos + step);
 }
 
 void DataGraph::drawCursor(uint16_t pos) {
@@ -129,16 +151,16 @@ void DataGraph::setGridMode(enum GridMode mode) {
     gridMode = mode;
 }
 
-void DataGraph::jumpTo(uint16_t n) {
-    rightBoundary = (n > ringBufferLength - 1 ? ringBufferLength - 1 : n);
+void DataGraph::setRightBoundary(int32_t n) {
+    rightBoundary = (n > 0 ? (n > ringBufferLength - 1 ? ringBufferLength - 1 : n) : 0);
 }
 
 double DataGraph::getValueAt(uint16_t n) {
     return (n > ringBufferLength - 1 ? dataRingBuffer[ringBufferLength - 1] : dataRingBuffer[n]);
 }
 
-void DataGraph::setCursorPos(uint16_t pos) {
-    cursorPos = pos;
+void DataGraph::setCursorPos(int32_t pos) {
+    cursorPos = (pos > 0 ? (pos > ringBufferLength - 1 ? ringBufferLength - 1 : pos) : 0);
 }
 
 void DataGraph::setCursorMode(enum CursorMode mode) {
