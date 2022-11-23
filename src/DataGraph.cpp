@@ -58,6 +58,9 @@ void DataGraph::moveCursor(int32_t step) {
 
 void DataGraph::drawCursor(uint16_t pos) {
     // *CALL AFTER SETTING PROPER PEAK AND BOTTOM VALUES!!*
+    // This function returns with DrawColor set to 1, and is independent of the said value on call.
+
+    if (pos > rightBoundary || pos < rightBoundary - floor((graphLength + xDistance) / (xDistance + 1))) return;  // Avoid out-of-bound values
 
     static char str[64];
     uint8_t charCount = sprintf(str, "%.0f", dataRingBuffer[pos]);  // 0 decimal places, customizable
@@ -71,9 +74,11 @@ void DataGraph::drawCursor(uint16_t pos) {
     switch (cursorMode) {
         case DETAILED:
             u8g2.setFont(U8G2_USER_FONT);  // DEBUG
+            u8g2.setDrawColor(2);  // XOR the following text
             u8g2.drawStr(strX, strY, str);
             // No break here!
         case SIMPLE:
+            u8g2.setDrawColor(1);  // To initialize, or to revert changes
             u8g2.drawVLine(curX, curY - 2 >= 0 ? curY - 2 : 0, curY - 2 >= 0 ? 5 : 5 + (curY - 2));  // 5 pixels tall
             if (curX - 1 >= 0) u8g2.drawVLine(curX - 1, curY - 2 >= 0 ? curY - 2 : 0, curY - 2 >= 0 ? 5 : 5 + (curY - 2));  // THICKER
             break;
@@ -83,6 +88,10 @@ void DataGraph::drawCursor(uint16_t pos) {
 }
 
 void DataGraph::draw() {
+    // The value of DrawColor on return depends on drawCursor(), and is independent of the said value on call.
+
+    u8g2.setDrawColor(1);  // To initialize
+
     if (autoScaling) {
         // Find peak value in window
         bottomValue = peakValue = dataRingBuffer[rightBoundary];  // Initialize with a feasible value
@@ -104,25 +113,24 @@ void DataGraph::draw() {
         if (bottomValue == peakValue) peakValue += 1.0;  // Bad things are gonna happen if they are equal
     }
 
-    if (xDistance == 0) {
+    if (/*xDistance == 0*/false) {  // This might be excessive!
         for (int32_t i = rightBoundary; i >= 0; i--) {
             if (rightBoundary - i > graphLength - 1) break;
             u8g2.drawPixel((graphLength - 1) - (rightBoundary - i), graphHeight - 1 - round((dataRingBuffer[i] - bottomValue) / (peakValue - bottomValue) * (graphHeight - 1)));
-            if (i == cursorPos) drawCursor(i);
         }
     } else {  // such complication
         for (uint16_t i = rightBoundary; i >= 1; i--) {
             if (rightBoundary - (i - 1) > floor((graphLength + xDistance) / (xDistance + 1)) - 1) {  // l = n + d(n - 1)
-                if (cursorPos == i) drawCursor(i);
                 break;
             }
             u8g2.drawLine((graphLength - 1) - (1 + xDistance) * (rightBoundary - i), \
                           graphHeight - 1 - round((dataRingBuffer[i] - bottomValue) / (peakValue - bottomValue) * (graphHeight - 1)), \
                           (graphLength - 1) - (1 + xDistance) * (rightBoundary - (i - 1)), \
                           graphHeight - 1 - round((dataRingBuffer[i - 1] - bottomValue) / (peakValue - bottomValue) * (graphHeight - 1)));
-            if (i == cursorPos || (i == 1 && cursorPos == 0)) drawCursor(cursorPos);
         }
     }
+
+    drawCursor(cursorPos);
 }
 
 void DataGraph::setAutoScroll(bool enabled) {

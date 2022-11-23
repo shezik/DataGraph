@@ -51,7 +51,7 @@ class DataGraph {
         double getValueAt(uint16_t n);
 
         uint16_t getCursorPos() {return cursorPos;}
-        void setCursorPos(int32_t pos);  // Detects out-of-bpund jumps
+        void setCursorPos(int32_t pos);  // Detects out-of-bound jumps
         void moveCursor(int32_t step);
         void setCursorMode(enum CursorMode mode);
 

@@ -49,6 +49,7 @@ void setup() {
     Serial.begin(115200);
     u8g2.begin();
     u8g2.setFont(U8G2_USER_FONT);
+    u8g2.setFontMode(1);   // Transparent
 
     if (!arciic.i2c_init()) Serial.println("Failed to init SlowSoftI2C!\n");
 
@@ -87,9 +88,9 @@ void setup() {
     powerGraph.init();
 
     // DataGraph 配置
-    voltageGraph.setXDistance(1);
-    currentGraph.setXDistance(1);
-    powerGraph.setXDistance(1);
+    voltageGraph.setXDistance(0);
+    currentGraph.setXDistance(0);
+    powerGraph.setXDistance(0);
     voltageGraph.setCursorMode(DETAILED);
     currentGraph.setCursorMode(DETAILED);
     powerGraph.setCursorMode(DETAILED);
@@ -210,6 +211,24 @@ void loop() {
                 break;
         }
     } else {
+        switch (whichGraph) {
+            case 0:
+                voltageGraph.draw();
+                u8g2.setDrawColor(2);
+                u8g2.drawStr(0, 8, "mV");
+                break;
+            case 1:
+                currentGraph.draw();
+                u8g2.setDrawColor(2);
+                u8g2.drawStr(0, 8, "mA");
+                break;
+            case 2:
+                powerGraph.draw();
+                u8g2.setDrawColor(2);
+                u8g2.drawStr(0, 8, "mW");
+                break;
+        }
+        // We assume that DrawColor is already set to 2
         static char charBuf[16];
         itoa(voltage, charBuf, 10);
         u8g2.drawStr(5, 64, charBuf);
@@ -217,20 +236,6 @@ void loop() {
         u8g2.drawStr(40, 64, charBuf);
         itoa(power, charBuf, 10);
         u8g2.drawStr(85, 64, charBuf);
-        switch (whichGraph) {
-            case 0:
-                u8g2.drawStr(0, 8, "mV");
-                voltageGraph.draw();
-                break;
-            case 1:
-                u8g2.drawStr(0, 8, "mA");
-                currentGraph.draw();
-                break;
-            case 2:
-                u8g2.drawStr(0, 8, "mW");
-                powerGraph.draw();
-                break;
-        }
     }
     u8g2.sendBuffer();
 }
