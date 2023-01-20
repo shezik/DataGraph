@@ -46,6 +46,8 @@ bool checkKey(int pin, int delayms) {
 }
 
 void setup() {
+    setCpuFrequencyMhz(240);
+
     Serial.begin(115200);
     u8g2.begin();
     u8g2.setFont(U8G2_USER_FONT);
@@ -83,9 +85,10 @@ void setup() {
     pinMode(17, OUTPUT);
 
     // 分配内存
-    voltageGraph.init();
-    currentGraph.init();
-    powerGraph.init();
+    readINA226();
+    voltageGraph.init(voltage);
+    currentGraph.init(current);
+    powerGraph.init(power);
 
     // DataGraph 配置
     voltageGraph.setXDistance(0);

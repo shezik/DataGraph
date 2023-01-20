@@ -5,6 +5,7 @@
 #define U8G2_USER_FONT u8g2_font_6x13B_mr
 #define U8G2_USER_FONT_WIDTH 6
 #define U8G2_USER_FONT_HEIGHT 13
+#define MINIMAL_Y_RESOLUTION 8  // Min N data points on Y axis, e.g. 0~9 would be 10 points
 
 #include <Arduino.h>
 #include <U8g2lib.h>
@@ -38,7 +39,7 @@ class DataGraph {
         DataGraph(uint16_t _graphLength, uint16_t _graphHeight, uint16_t _ringBufferLength, U8G2_DEVICE_TYPE _u8g2);
         ~DataGraph();
 
-        bool init();  // Allocate memory for the buffer
+        bool init(double fillVal = 0.0);  // Allocate memory for the buffer
         void draw();  // Please call u8g2.sendBuffer() manually
         void appendValue(double val);  // !! POSITIVE VALUE ONLY!?
         void setAutoScroll(bool enabled);  // Move screen AND cursor to right boundary **on data addition**

@@ -16,11 +16,11 @@ DataGraph::~DataGraph() {
     dataRingBuffer = nullptr;  // Excessive?
 }
 
-bool DataGraph::init() {
+bool DataGraph::init(double fillVal) {
     dataRingBuffer = (double *) malloc(ringBufferLength * sizeof(double));
     if (dataRingBuffer) {
         for (uint16_t i = 0; i < ringBufferLength; i++) {
-            dataRingBuffer[i] = 0.0;
+            dataRingBuffer[i] = fillVal;
         }
         return true;
     } else return false;
@@ -110,15 +110,19 @@ void DataGraph::draw() {
                 }
             }
         }
-        if (bottomValue == peakValue) peakValue += 1.0;  // Bad things are gonna happen if they are equal
+        // if (bottomValue == peakValue) peakValue += 1.0;  // Bad things are gonna happen if they are equal
+        if (peakValue - bottomValue < MINIMAL_Y_RESOLUTION - 1) peakValue = bottomValue + MINIMAL_Y_RESOLUTION - 1;
     }
 
-    if (/*xDistance == 0*/false) {  // This might be excessive!
+    #if 0  // This section might be excessive!
+    if (xDistance == 0) {
         for (int32_t i = rightBoundary; i >= 0; i--) {
             if (rightBoundary - i > graphLength - 1) break;
             u8g2.drawPixel((graphLength - 1) - (rightBoundary - i), graphHeight - 1 - round((dataRingBuffer[i] - bottomValue) / (peakValue - bottomValue) * (graphHeight - 1)));
         }
     } else {  // such complication
+    #endif
+
         for (uint16_t i = rightBoundary; i >= 1; i--) {
             if (rightBoundary - (i - 1) > floor((graphLength + xDistance) / (xDistance + 1)) - 1) {  // l = n + d(n - 1)
                 break;
@@ -128,7 +132,10 @@ void DataGraph::draw() {
                           (graphLength - 1) - (1 + xDistance) * (rightBoundary - (i - 1)), \
                           graphHeight - 1 - round((dataRingBuffer[i - 1] - bottomValue) / (peakValue - bottomValue) * (graphHeight - 1)));
         }
+
+    #if 0
     }
+    #endif
 
     drawCursor(cursorPos);
 }
