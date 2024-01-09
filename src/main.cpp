@@ -4,6 +4,9 @@
 #include <SlowSoftI2CMaster.h>
 #include <INA226.h>
 
+unsigned long prevMillis = 0;
+#define PROFILE(name) {do {printf(name " took %lu ms\n", millis() - prevMillis); prevMillis = millis();} while (false);}
+
 #define I2C_DATA 17
 #define I2C_CLK 5
 
@@ -100,9 +103,11 @@ void setup() {
 
 void loop() {
     readINA226();
+    PROFILE("readINA226");
     voltageGraph.appendValue(voltage);
     currentGraph.appendValue(current);
     powerGraph.appendValue(power);
+    PROFILE("appendValue x3");
 
     // These four keys are equipped with hardware debouncing
     if (checkKey(2)) {  // Up
@@ -122,6 +127,7 @@ void loop() {
             whichGraph = (whichGraph == 2 ? 0 : whichGraph + 1);
         }
     }
+    PROFILE("checkKey part 1");
 
     if (displayMode == 0) {
         if (checkKey(32, 10)) {  // OK
@@ -198,6 +204,7 @@ void loop() {
             }
         }
     }
+    PROFILE("checkKey part 2");
 
     u8g2.clearBuffer();
     if (displayMode) {
@@ -239,5 +246,7 @@ void loop() {
         itoa(power, charBuf, 10);
         u8g2.drawStr(85, 64, charBuf);
     }
+    PROFILE("Drawing buffer");
     u8g2.sendBuffer();
+    PROFILE("Sending buffer");
 }
