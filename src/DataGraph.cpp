@@ -13,17 +13,18 @@ DataGraph::DataGraph(uint16_t _graphLength, uint16_t _graphHeight, uint16_t _rin
 
 DataGraph::~DataGraph() {
     free(dataRingBuffer);
-    dataRingBuffer = nullptr;  // Excessive?
+    dataRingBuffer = nullptr;
 }
 
 bool DataGraph::init(double fillVal) {
     dataRingBuffer = (double *) malloc(ringBufferLength * sizeof(double));
-    if (dataRingBuffer) {
-        for (uint16_t i = 0; i < ringBufferLength; i++) {
-            dataRingBuffer[i] = fillVal;
-        }
-        return true;
-    } else return false;
+    if (!dataRingBuffer)
+        return false;
+
+    for (uint16_t i = 0; i < ringBufferLength; i++)
+        dataRingBuffer[i] = fillVal;
+
+    return true;
 }
 
 void DataGraph::appendValue(double val) {
