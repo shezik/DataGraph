@@ -4,7 +4,10 @@
 #include <SlowSoftI2CMaster.h>
 #include <INA226.h>
 
-U8G2_DEVICE_TYPE u8g2(U8G2_R0, /* clock=*/5, /* data=*/17 /*, reset=*/);
+#define I2C_DATA 17
+#define I2C_CLK 5
+
+U8G2_DEVICE_TYPE u8g2(U8G2_R0, U8X8_PIN_NONE, I2C_CLK, I2C_DATA);
 SlowSoftI2CMaster arciic = SlowSoftI2CMaster(19, 18);
 DataGraph voltageGraph(128, 64, 256, u8g2);
 DataGraph currentGraph(128, 64, 256, u8g2);
@@ -79,10 +82,6 @@ void setup() {
     // USB 数据线
     pinMode(34, INPUT);  // USB D+
     pinMode(35, INPUT);  // USB D-
-
-    // 屏幕 I/O
-    pinMode(5,  OUTPUT);
-    pinMode(17, OUTPUT);
 
     // 分配内存
     readINA226();
